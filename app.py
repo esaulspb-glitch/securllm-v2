@@ -62,14 +62,6 @@ with col2:
         label_visibility="collapsed"
     )
 
-# --- РАЗМЕРЫ ПОМЕЩЕНИЯ (для чертежа) ---
-st.markdown("**Размеры помещения (для схемы):**")
-col_w, col_h = st.columns(2)
-with col_w:
-    room_width = st.number_input("Ширина (м)", min_value=2.0, max_value=50.0, value=6.0, step=0.5)
-with col_h:
-    room_height = st.number_input("Длина (м)", min_value=2.0, max_value=50.0, value=8.0, step=0.5)
-
 # --- ВЫБОР СЦЕНАРИЯ ---
 st.markdown("**Выберите сценарий выдачи результата:**")
 scenario = st.radio(
@@ -84,13 +76,15 @@ scenario = st.radio(
 legal_check = st.checkbox("✅ Проверить аттестат МЧС у проектировщика (заглушка)")
 
 # --- ФУНКЦИЯ ГЕНЕРАЦИИ ПРОФЕССИОНАЛЬНОГО ЧЕРТЕЖА В SVG ---
-def generate_blueprint(room_desc, equipment_list, width_m, height_m):
+def generate_blueprint(room_desc, equipment_list, width_m=6.0, height_m=8.0):
     """
     Генерирует SVG-чертёж помещения с расстановкой оборудования по нормативным обозначениям.
+    Размеры по умолчанию (6×8 м) используются для демонстрации.
+    В промышленной версии размеры загружаются из BIM/1С.
     """
     # Масштаб: 1 м = 40 пикселей
     scale = 40
-    svg_w = width_m * scale + 120  # + отступы для легенды
+    svg_w = width_m * scale + 120
     svg_h = height_m * scale + 160
 
     # Отступы для чертежа
@@ -108,7 +102,7 @@ def generate_blueprint(room_desc, equipment_list, width_m, height_m):
     text = "#e0e9ee"
     grid = "#1e2a2a"
 
-    svg = f'<svg width="{svg_w}" height="{svgh}" xmlns="http://www.w3.org/2000/svg" style="background-color: {bg}; border-radius: 12px; font-family: Inter, sans-serif;">'
+    svg = f'<svg width="{svg_w}" height="{svg_h}" xmlns="http://www.w3.org/2000/svg" style="background-color: {bg}; border-radius: 12px; font-family: Inter, sans-serif;">'
 
     # --- Сетка (для масштаба) ---
     for x in range(0, width_m + 1):
@@ -137,8 +131,6 @@ def generate_blueprint(room_desc, equipment_list, width_m, height_m):
     svg += f'<text x="{win_x + 5}" y="{win_y + 28}" fill="{text}" font-size="8">Окно</text>'
 
     # --- Размещение оборудования (по нормативным символам) ---
-    # Используем список equipment_list для расстановки
-    # Координаты задаём условно, но с привязкой к геометрии помещения
     equipment_positions = {
         "СКУД": {"x": door_x + 15, "y": door_y - 20, "symbol": "C"},
         "Видео": {"x": room_x + room_w - 30, "y": room_y + 30, "symbol": "V"},
@@ -149,14 +141,12 @@ def generate_blueprint(room_desc, equipment_list, width_m, height_m):
         "Контроллер": {"x": room_x + 20, "y": room_y + 60, "symbol": "K"},
     }
 
-    # Рисуем оборудование из списка
     drawn = []
     for eq in equipment_list:
         eq_clean = eq.strip()
         if eq_clean in equipment_positions:
             pos = equipment_positions[eq_clean]
             if eq_clean not in drawn:
-                # Рисуем символ в зависимости от типа
                 x = pos["x"]
                 y = pos["y"]
                 sym = pos["symbol"]
@@ -183,11 +173,10 @@ def generate_blueprint(room_desc, equipment_list, width_m, height_m):
                     svg += f'<rect x="{x-12}" y="{y-8}" width="24" height="16" fill="#8b5cf6" rx="2" />'
                     svg += f'<text x="{x-6}" y="{y+3}" fill="#fff" font-size="8">{sym}</text>'
                 
-                # Добавляем позиционный номер
                 svg += f'<text x="{x}" y="{y + 25}" fill="{text}" font-size="7">{eq_clean[:3]}{drawn.count(eq_clean)+1}</text>'
                 drawn.append(eq_clean)
 
-    # --- Легенда (таблица с условными обозначениями) ---
+    # --- Легенда ---
     legend_x = margin
     legend_y = room_y + room_h + 30
     svg += f'<text x="{legend_x}" y="{legend_y}" fill="{text}" font-size="12" font-weight="bold">Условные обозначения:</text>'
@@ -336,9 +325,11 @@ if st.button("Получить рекомендацию", type="primary", use_co
                         if not equipment_list:
                             equipment_list = ["СКУД", "Видео", "Движение", "Дым", "Ручной", "Газ", "Контроллер"]
                         
-                        # Генерируем чертёж с учётом размеров
-                        svg = generate_blueprint(room_desc, equipment_list, room_width, room_height)
+                        # Генерируем чертёж с условными размерами (6×8 м)
+                        # В промышленной версии размеры будут загружаться из BIM/1С
+                        svg = generate_blueprint(room_desc, equipment_list)
                         st.markdown("### 📐 План расстановки оборудования")
+                        st.markdown("_*Размеры помещения указаны условно (6×8 м). В промышленной версии данные загружаются из BIM/1С._")
                         st.markdown(svg, unsafe_allow_html=True)
 
             except Exception as e:
