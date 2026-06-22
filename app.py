@@ -75,6 +75,107 @@ scenario = st.radio(
 # --- ЮРИДИЧЕСКИЙ ФИЛЬТР (заглушка) ---
 legal_check = st.checkbox("✅ Проверить аттестат МЧС у проектировщика (заглушка)")
 
+# --- ФУНКЦИЯ ГЕНЕРАЦИИ SVG-СХЕМЫ ---
+def generate_svg(room_desc, equipment_list):
+    """
+    Генерирует простую SVG-схему расстановки оборудования.
+    room_desc: описание помещения (для подписи)
+    equipment_list: список строк с описанием оборудования (из GigaChat)
+    """
+    # Параметры SVG
+    width = 600
+    height = 400
+    # Основные цвета
+    bg_color = "#1e2a2a"
+    wall_color = "#4ade80"
+    door_color = "#f59e0b"
+    window_color = "#60a5fa"
+    text_color = "#e0e9ee"
+    
+    # Начало SVG
+    svg = f'<svg width="{width}" height="{height}" xmlns="http://www.w3.org/2000/svg" style="background-color: {bg_color}; border-radius: 12px; font-family: Inter, sans-serif;">'
+    
+    # --- План помещения (прямоугольник) ---
+    margin = 40
+    room_x = margin
+    room_y = margin
+    room_w = width - 2*margin
+    room_h = height - 2*margin
+    
+    # Стены
+    svg += f'<rect x="{room_x}" y="{room_y}" width="{room_w}" height="{room_h}" fill="none" stroke="{wall_color}" stroke-width="2" stroke-dasharray="4" />'
+    svg += f'<text x="{room_x + 10}" y="{room_y + 20}" fill="{text_color}" font-size="12">{room_desc[:30]}...</text>'
+    
+    # --- Дверь (входная, слева снизу) ---
+    door_x = room_x + 10
+    door_y = room_y + room_h - 40
+    svg += f'<rect x="{door_x}" y="{door_y}" width="30" height="20" fill="{door_color}" rx="2" />'
+    svg += f'<text x="{door_x}" y="{door_y + 35}" fill="{text_color}" font-size="8">Дверь</text>'
+    
+    # --- Окно (справа сверху) ---
+    win_x = room_x + room_w - 60
+    win_y = room_y + 20
+    svg += f'<rect x="{win_x}" y="{win_y}" width="40" height="15" fill="{window_color}" rx="2" />'
+    svg += f'<text x="{win_x}" y="{win_y + 30}" fill="{text_color}" font-size="8">Окно</text>'
+    
+    # --- Расстановка оборудования (условные иконки) ---
+    # Парсим список оборудования (переданный из GigaChat) и размещаем условно
+    # Для демонстрации размещаем несколько типовых иконок с подписями
+    
+    # Считыватель СКУД (у двери)
+    svg += f'<circle cx="{door_x + 15}" cy="{door_y - 15}" r="8" fill="#3b82f6" />'
+    svg += f'<text x="{door_x + 5}" y="{door_y - 25}" fill="{text_color}" font-size="8">СКУД</text>'
+    
+    # Видеокамера (в правом верхнем углу)
+    cam_x = room_x + room_w - 30
+    cam_y = room_y + 40
+    svg += f'<circle cx="{cam_x}" cy="{cam_y}" r="10" fill="#ef4444" />'
+    svg += f'<text x="{cam_x - 15}" y="{cam_y - 18}" fill="{text_color}" font-size="8">Видео</text>'
+    
+    # Датчик движения (по центру потолка)
+    motion_x = room_x + room_w//2
+    motion_y = room_y + 20
+    svg += f'<polygon points="{motion_x},{motion_y-10} {motion_x-10},{motion_y+5} {motion_x+10},{motion_y+5}" fill="#facc15" />'
+    svg += f'<text x="{motion_x - 15}" y="{motion_y + 20}" fill="{text_color}" font-size="8">Движ.</text>'
+    
+    # Дымовой извещатель (слева сверху)
+    smoke_x = room_x + 50
+    smoke_y = room_y + 30
+    svg += f'<circle cx="{smoke_x}" cy="{smoke_y}" r="8" fill="#a855f7" />'
+    svg += f'<text x="{smoke_x - 15}" y="{smoke_y - 12}" fill="{text_color}" font-size="8">Дым</text>'
+    
+    # Ручной извещатель (у выхода)
+    manual_x = room_x + room_w - 50
+    manual_y = room_y + room_h - 30
+    svg += f'<rect x="{manual_x-5}" y="{manual_y-10}" width="10" height="15" fill="#ec4899" rx="2" />'
+    svg += f'<text x="{manual_x - 15}" y="{manual_y + 15}" fill="{text_color}" font-size="8">Ручн.</text>'
+    
+    # Модуль газового пожаротушения (в центре)
+    gas_x = room_x + room_w//2
+    gas_y = room_y + room_h//2
+    svg += f'<circle cx="{gas_x}" cy="{gas_y}" r="12" fill="#06b6d4" />'
+    svg += f'<text x="{gas_x - 15}" y="{gas_y - 18}" fill="{text_color}" font-size="8">Газ</text>'
+    
+    # --- Легенда ---
+    legend_x = room_x + 10
+    legend_y = room_y + room_h + 20
+    svg += f'<text x="{legend_x}" y="{legend_y}" fill="{text_color}" font-size="10" font-weight="bold">Легенда:</text>'
+    items = [
+        ("#3b82f6", "СКУД"),
+        ("#ef4444", "Видео"),
+        ("#facc15", "Движение"),
+        ("#a855f7", "Дым"),
+        ("#ec4899", "Ручной"),
+        ("#06b6d4", "Газ"),
+    ]
+    for i, (color, label) in enumerate(items):
+        x = legend_x + 60 + i*70
+        svg += f'<circle cx="{x}" cy="{legend_y-4}" r="6" fill="{color}" />'
+        svg += f'<text x="{x+10}" y="{legend_y}" fill="{text_color}" font-size="8">{label}</text>'
+    
+    svg += '</svg>'
+    return svg
+
 # --- КНОПКА ---
 if st.button("Получить рекомендацию", type="primary", use_container_width=True):
     if manual_input.strip():
@@ -156,6 +257,9 @@ if st.button("Получить рекомендацию", type="primary", use_co
 4. Смета (на основе спецификации):
    Таблица: Наименование работ, Ед. изм., Кол-во, Стоимость ед., Сумма.
    Добавить накладные расходы (15% от прямых затрат).
+
+После текстового описания схемы выведи список оборудования в формате:
+Оборудование: [список через запятую: СКУД, Видео, Движение, Дым, Ручной, Газ]
 """
                     elif scenario == "Заявка":
                         scenario_instruction = """
@@ -166,6 +270,8 @@ if st.button("Получить рекомендацию", type="primary", use_co
 3. Спецификация...
 4. Смета...
 5. Заявка: Заявка сформирована и направлена исполнителям. Исполнитель: назначен автоматически. Статус: принята в работу.
+После текстового описания схемы выведи список оборудования в формате:
+Оборудование: [список через запятую: СКУД, Видео, Движение, Дым, Ручной, Газ]
 """
 
                     legal_text = ""
@@ -181,6 +287,24 @@ if st.button("Получить рекомендацию", type="primary", use_co
 
                     st.success("✅ Документация готова")
                     st.markdown(raw)
+
+                    # --- ГЕНЕРАЦИЯ SVG-СХЕМЫ ДЛЯ СЦЕНАРИЯ "ПРОЕКТ" ---
+                    if scenario in ["Проект", "Заявка"]:
+                        # Парсим список оборудования из ответа
+                        equipment_list = []
+                        if "Оборудование:" in raw:
+                            equip_part = raw.split("Оборудование:")[-1].strip()
+                            # Берём первую строку или до конца
+                            equipment_list = [e.strip() for e in equip_part.split(",") if e.strip()]
+                        
+                        # Если список не получен, используем стандартный набор для демонстрации
+                        if not equipment_list:
+                            equipment_list = ["СКУД", "Видео", "Движение", "Дым", "Ручной", "Газ"]
+                        
+                        # Генерируем SVG
+                        svg = generate_svg(room_desc, equipment_list)
+                        st.markdown("### 📐 Схема расстановки оборудования (условная)")
+                        st.markdown(svg, unsafe_allow_html=True)
 
             except Exception as e:
                 st.error(f"❌ Ошибка при обращении к GigaChat: {e}")
