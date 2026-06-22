@@ -84,15 +84,19 @@ def generate_blueprint(room_desc, equipment_list, width_m=6.0, height_m=8.0):
     """
     # Масштаб: 1 м = 40 пикселей
     scale = 40
-    svg_w = width_m * scale + 120
-    svg_h = height_m * scale + 160
+    # Приводим размеры к целым для range
+    w_int = int(round(width_m))
+    h_int = int(round(height_m))
+    
+    svg_w = w_int * scale + 120
+    svg_h = h_int * scale + 160
 
     # Отступы для чертежа
     margin = 50
     room_x = margin
     room_y = margin
-    room_w = width_m * scale
-    room_h = height_m * scale
+    room_w = w_int * scale
+    room_h = h_int * scale
 
     # Цвета
     bg = "#0f1a1a"
@@ -105,10 +109,10 @@ def generate_blueprint(room_desc, equipment_list, width_m=6.0, height_m=8.0):
     svg = f'<svg width="{svg_w}" height="{svg_h}" xmlns="http://www.w3.org/2000/svg" style="background-color: {bg}; border-radius: 12px; font-family: Inter, sans-serif;">'
 
     # --- Сетка (для масштаба) ---
-    for x in range(0, width_m + 1):
+    for x in range(0, w_int + 1):
         x_px = room_x + x * scale
         svg += f'<line x1="{x_px}" y1="{room_y}" x2="{x_px}" y2="{room_y + room_h}" stroke="{grid}" stroke-width="0.5" />'
-    for y in range(0, height_m + 1):
+    for y in range(0, h_int + 1):
         y_px = room_y + y * scale
         svg += f'<line x1="{room_x}" y1="{y_px}" x2="{room_x + room_w}" y2="{y_px}" stroke="{grid}" stroke-width="0.5" />'
 
