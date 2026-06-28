@@ -12,7 +12,7 @@ st.markdown("""
     }
     .main > div {
         background-color: #f8f9fa;
-        padding-top: 2.5rem !important;
+        padding-top: 6rem !important;
     }
     h1, h2, h3, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
         color: #1a1a1a !important;
