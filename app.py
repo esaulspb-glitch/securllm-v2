@@ -4,7 +4,7 @@ from gigachat import GigaChat
 
 st.set_page_config(page_title="SecurLLM — прототип", layout="centered")
 
-# --- СТИЛИ (SberDesign + отступ сверху) ---
+# --- СТИЛИ (SberDesign) ---
 st.markdown("""
 <style>
     .stApp {
@@ -12,11 +12,7 @@ st.markdown("""
     }
     .main > div {
         background-color: #f8f9fa;
-        padding-top: 4rem !important;  /* ← увеличенный отступ сверху */
-    }
-    .block-container {
-        padding-top: 2rem !important;
-        padding-bottom: 2rem !important;
+        padding-top: 2.5rem !important;
     }
     h1, h2, h3, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
         color: #1a1a1a !important;
@@ -72,12 +68,16 @@ st.markdown("""
     hr {
         border-color: #d0d7de !important;
     }
+    .block-container {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# --- ЛОГОТИП СБЕРА (с явным margin-top) ---
+# --- ЛОГОТИП СБЕРА ---
 st.markdown("""
-<div style="margin-top: 20px; display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; border-bottom: 1px solid #d0d7de; padding-bottom: 1rem;">
+<div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; border-bottom: 1px solid #d0d7de; padding-bottom: 1rem;">
     <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect width="36" height="36" rx="8" fill="#1A991A"/>
         <path d="M10 18L14 22L26 10" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
