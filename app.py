@@ -4,7 +4,7 @@ from gigachat import GigaChat
 
 st.set_page_config(page_title="SecurLLM — прототип", layout="centered")
 
-# --- СТИЛИ (SberDesign) ---
+# --- СТИЛИ (SberDesign с отступом сверху) ---
 st.markdown("""
 <style>
     /* Общий фон и текст */
@@ -13,6 +13,7 @@ st.markdown("""
     }
     .main > div {
         background-color: #f8f9fa;
+        padding-top: 2.5rem !important;  /* ← увеличенный отступ сверху */
     }
     h1, h2, h3, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
         color: #1a1a1a !important;
@@ -94,11 +95,11 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# --- ЗАГОЛОВОК ---
+# --- ЗАГОЛОВОК (согласован с лендингом) ---
 st.markdown("""
     <div style="text-align: left; margin-bottom: 1.5rem;">
-        <h1 style="color: #1a1a1a; font-size: 2rem; font-weight: 700; margin-bottom: 0.2rem;">Методология оснащения ИТСО и пожарной безопасности</h1>
-        <p style="color: #4a4a4a; font-size: 1rem; margin-top: 0;">Интеллектуальная классификация помещений на основе GigaChat</p>
+        <h1 style="color: #1a1a1a; font-size: 2rem; font-weight: 700; margin-bottom: 0.2rem;">SecurLLM</h1>
+        <p style="color: #4a4a4a; font-size: 1rem; margin-top: 0;">Система проектирования, оптимизации и управления безопасностью и противопожарной защитой объектов банка на всех этапах жизненного цикла.</p>
     </div>
 """, unsafe_allow_html=True)
 
